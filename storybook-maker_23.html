@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Storybook Studio ✨</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:ital,wght@0,400;0,600;0,700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --sky:#fdf6ee; --cream:#fffdf7; --yellow:#ffd166; --coral:#ff6b6b;
+  --mint:#06d6a0; --blue:#118ab2; --purple:#9b5de5; --navy:#1a1a2e;
+  --ink:#2d2d44; --paper:#fffef9; --border:#e8d9c5; --shadow:rgba(45,45,68,.10);
+  --panel-w:320px;
+  /* book height = viewport minus header(84) title(48) nav(68) dots(30) gaps(20) */
+  --bh: calc(100vh - 250px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--sky);color:var(--ink);min-height:100vh;overflow-x:hidden}
+
+/* BG */
+.bg-shapes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.shape{position:absolute;border-radius:50%;opacity:.055;animation:floatShape 14s ease-in-out infinite}
+.shape:nth-child(1){width:400px;height:400px;background:var(--yellow);top:-120px;left:-100px}
+.shape:nth-child(2){width:240px;height:240px;background:var(--coral);top:35%;right:-70px;animation-delay:-4s}
+.shape:nth-child(3){width:300px;height:300px;background:var(--purple);bottom:5%;left:3%;animation-delay:-8s}
+.shape:nth-child(4){width:180px;height:180px;background:var(--mint);bottom:25%;right:8%;animation-delay:-11s}
+@keyframes floatShape{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-26px) rotate(7deg)}}
+
+/* HEADER */
+header{position:relative;z-index:20;padding:18px 40px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:12px;cursor:pointer}
+.logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--yellow),var(--coral));border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 14px rgba(255,107,107,.28);animation:wiggle 5s ease-in-out infinite}
+@keyframes wiggle{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+.logo-text{font-family:'Baloo 2',cursive;font-size:21px;font-weight:800;color:var(--navy)}
+.logo-text span{color:var(--coral)}
+.header-btn{padding:9px 20px;border-radius:30px;border:2px solid var(--border);background:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink);display:flex;align-items:center;gap:6px;transition:all .2s;box-shadow:0 2px 8px var(--shadow)}
+.header-btn:hover{border-color:var(--purple);color:var(--purple);transform:translateY(-1px)}
+
+/* HOME */
+#homeView{position:relative;z-index:10}
+.home-hero{text-align:center;padding:40px 24px 16px}
+.home-hero h1{font-family:'Baloo 2',cursive;font-size:clamp(2.2rem,4.5vw,3.5rem);font-weight:800;color:var(--navy);line-height:1.15;margin-bottom:12px}
+.home-hero h1 em{font-style:normal;color:var(--coral);position:relative}
+.home-hero h1 em::after{content:'';position:absolute;left:0;right:0;bottom:2px;height:7px;background:var(--yellow);border-radius:4px;z-index:-1;opacity:.75}
+.home-hero p{font-size:1.05rem;color:#777;max-width:480px;margin:0 auto;line-height:1.7}
+.section-label{max-width:1200px;margin:44px auto 0;padding:0 40px;display:flex;align-items:center;gap:14px}
+.section-label h2{font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:700;color:var(--navy);white-space:nowrap}
+.section-line{flex:1;height:2px;background:var(--border);border-radius:2px}
+.shelf{max-width:1200px;margin:24px auto 80px;padding:0 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:32px;align-items:end}
+.book-card{cursor:pointer;display:flex;flex-direction:column;align-items:center;animation:riseIn .5s ease both}
+@keyframes riseIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.book-card:nth-child(1){animation-delay:.04s}.book-card:nth-child(2){animation-delay:.08s}
+.book-card:nth-child(3){animation-delay:.12s}.book-card:nth-child(4){animation-delay:.16s}
+.book-card:nth-child(5){animation-delay:.20s}.book-card:nth-child(6){animation-delay:.24s}
+.book-card:nth-child(7){animation-delay:.28s}
+.book-3d{width:148px;height:196px;position:relative;transform:perspective(600px) rotateY(-12deg);transition:transform .35s cubic-bezier(.34,1.56,.64,1),filter .35s;filter:drop-shadow(6px 10px 18px rgba(0,0,0,.22))}
+.book-card:hover .book-3d{transform:perspective(600px) rotateY(-4deg) translateY(-10px) scale(1.04);filter:drop-shadow(10px 20px 28px rgba(0,0,0,.28))}
+.book-cover{width:100%;height:100%;border-radius:3px 10px 10px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 12px;position:relative;overflow:hidden}
+.book-spine-bar{position:absolute;left:0;top:0;bottom:0;width:14px;border-radius:3px 0 0 3px;background:rgba(0,0,0,.25)}
+.book-sheen{position:absolute;top:0;left:14px;right:0;bottom:0;background:linear-gradient(135deg,rgba(255,255,255,.22) 0%,transparent 55%);pointer-events:none}
+.book-emoji{font-size:50px;margin-bottom:10px;position:relative;z-index:1}
+.book-title-text{font-family:'Baloo 2',cursive;font-size:13px;font-weight:800;text-align:center;color:white;text-shadow:0 2px 8px rgba(0,0,0,.45);line-height:1.3;position:relative;z-index:1}
+.book-genre{font-size:10px;font-weight:700;color:rgba(255,255,255,.7);margin-top:5px;letter-spacing:.06em;text-transform:uppercase;position:relative;z-index:1}
+.book-shadow{width:128px;height:11px;background:radial-gradient(ellipse,rgba(0,0,0,.18) 0%,transparent 70%);margin-top:6px;border-radius:50%}
+.book-label{margin-top:10px;font-size:13px;font-weight:700;color:var(--ink);text-align:center}
+.book-sublabel{font-size:11px;color:#aaa;font-weight:600;margin-top:2px;text-align:center}
+.book-card-new .book-3d{border:3px dashed var(--border);border-radius:10px;background:rgba(255,255,255,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+.book-card-new .book-3d:hover{border-color:var(--purple);background:rgba(239,230,255,.6)}
+.new-plus{width:46px;height:46px;background:var(--purple);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:white;font-weight:700;box-shadow:0 4px 16px rgba(155,93,229,.35)}
+.new-label{font-size:13px;font-weight:700;color:var(--purple)}
+
+/* EDITOR */
+#editorView{display:none;position:relative;z-index:10;opacity:0;transform:translateY(28px);transition:opacity .4s ease,transform .4s ease;height:calc(100vh - 80px)}
+#editorView.visible{opacity:1;transform:translateY(0)}
+.editor-layout{display:flex;height:100%;overflow:hidden}
+
+/* LEFT PANEL */
+.left-panel{width:var(--panel-w);min-width:var(--panel-w);background:var(--paper);border-right:2px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;box-shadow:4px 0 24px rgba(45,45,68,.07);position:relative;z-index:5}
+.left-panel::-webkit-scrollbar{width:5px}
+.left-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+.panel-header{padding:18px 20px 12px;border-bottom:2px solid var(--border);position:sticky;top:0;background:var(--paper);z-index:2}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:#999;cursor:pointer;padding:6px 14px;border-radius:30px;border:2px solid var(--border);background:var(--sky);transition:all .2s;margin-bottom:10px}
+.back-btn:hover{color:var(--coral);border-color:var(--coral)}
+.panel-title{font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:800;color:var(--navy)}
+.panel-subtitle{font-size:12px;color:#aaa;font-weight:600;margin-top:2px}
+.panel-section{padding:16px 20px 0}
+.panel-section+.panel-section{border-top:2px solid var(--border)}
+.section-heading{font-family:'Baloo 2',cursive;font-size:.93rem;font-weight:700;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.sh-icon{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px}
+label{display:block;font-size:.78rem;font-weight:700;color:#aaa;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
+input[type="text"],textarea{width:100%;padding:9px 13px;border:2px solid var(--border);border-radius:11px;font-family:'Nunito',sans-serif;font-size:.93rem;background:var(--cream);color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:13px}
+input:focus,textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(155,93,229,.10)}
+textarea{resize:vertical;min-height:70px}
+.char-grid-sm{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}
+.char-btn{background:var(--cream);border:2px solid var(--border);border-radius:11px;padding:9px 3px;cursor:pointer;text-align:center;transition:all .18s;font-size:10px;font-weight:700;color:#aaa;font-family:'Nunito',sans-serif}
+.char-btn .ce{font-size:22px;display:block;margin-bottom:2px}
+.char-btn:hover{border-color:var(--purple);background:#f5eeff;color:var(--purple);transform:scale(1.06)}
+.char-btn.active{border-color:var(--purple);background:#eedeff;color:var(--purple)}
+.color-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.color-swatch{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform .2s,border-color .2s;box-shadow:0 2px 7px rgba(0,0,0,.13)}
+.color-swatch:hover{transform:scale(1.18)}.color-swatch.active{border-color:var(--navy);transform:scale(1.15)}
+.chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.chip{padding:5px 13px;border-radius:30px;border:2px solid var(--border);background:var(--cream);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:#888;transition:all .18s}
+.chip:hover{border-color:var(--coral);color:var(--coral);background:#fff0f0}
+.chip.active{border-color:var(--coral);background:#ffe0e0;color:var(--coral)}
+.page-counter{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.page-counter span{font-weight:700;color:var(--ink);min-width:55px;text-align:center;font-size:.93rem}
+.count-btn{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:var(--cream);font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);transition:all .18s}
+.count-btn:hover{background:var(--yellow);border-color:var(--yellow)}
+.panel-footer{padding:14px 20px 18px;margin-top:auto;border-top:2px solid var(--border)}
+.btn-generate{width:100%;padding:14px 20px;border-radius:15px;border:none;background:linear-gradient(135deg,var(--coral),var(--purple));color:white;font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:700;cursor:pointer;box-shadow:0 5px 20px rgba(155,93,229,.30);transition:all .22s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-generate:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 10px 28px rgba(155,93,229,.40)}
+.btn-generate:active{transform:scale(.98)}
+.btn-generate:disabled{opacity:.7;cursor:wait}
+.loading-dots{display:none;gap:5px}
+.loading-dots .dot{width:6px;height:6px;border-radius:50%;background:white;animation:bounce 1.2s ease-in-out infinite}
+.loading-dots .dot:nth-child(2){animation-delay:.2s}.loading-dots .dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:scale(.7)}40%{transform:scale(1)}}
+
+/* ══════════════════════════════════════════════════════════
+   BOOK STAGE
+══════════════════════════════════════════════════════════ */
+.book-stage{
+  flex:1;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:14px 24px 10px;
+  background:radial-gradient(ellipse at 60% 10%,rgba(255,209,102,.12) 0%,transparent 55%),
+             radial-gradient(ellipse at 20% 80%,rgba(155,93,229,.08) 0%,transparent 50%),var(--sky);
+}
+
+.book-stage-title{
+  font-family:'Baloo 2',cursive;font-size:1.25rem;font-weight:800;color:var(--navy);
+  text-align:center;margin-bottom:8px;flex-shrink:0;
+  border:2px solid transparent;border-radius:12px;padding:3px 14px;
+  cursor:text;transition:border-color .2s,background .2s;
+  outline:none;max-width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.book-stage-title:hover{border-color:var(--border);background:rgba(255,255,255,.5)}
+.book-stage-title:focus{border-color:var(--purple);background:white;box-shadow:0 0 0 3px rgba(155,93,229,.1);white-space:normal;overflow:visible}
+.book-stage-title:empty::before{content:attr(placeholder);color:#ccc}
+
+/* book-wrap: sized to exactly what's being shown, centred by the stage's align-items:center */
+.book-wrap{
+  position:relative;
+  height:var(--bh);
+  min-height:200px;
+  flex-shrink:0;
+  /* default: cover = portrait 3:4 ratio */
+  width:calc(var(--bh) * 0.75);
+}
+.book-wrap.is-open{
+  /* spread = landscape 3:2 ratio (two portrait pages) */
+  width:calc(var(--bh) * 1.5);
+}
+/* viewer always fills its wrap exactly */
+.book-viewer{
+  position:absolute;
+  inset:0;
+}
+
+
+/* ── CHARACTER PHOTOS ─── */
+.char-photos-section{padding:14px 20px 16px;border-top:2px solid var(--border)}
+.char-photos-hint{font-size:11px;color:#aaa;font-weight:600;line-height:1.5;margin-bottom:10px}
+.char-photos-hint strong{color:var(--purple)}
+.photo-upload-zone{border:2px dashed var(--border);border-radius:13px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;background:var(--cream);margin-bottom:10px;position:relative}
+.photo-upload-zone:hover{border-color:var(--purple);background:#f5eeff}
+.photo-upload-zone.drag-over{border-color:var(--purple);background:#eedeff;transform:scale(1.01)}
+.photo-upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.photo-upload-icon{font-size:24px;margin-bottom:4px}
+.photo-upload-text{font-size:12px;font-weight:700;color:#aaa}
+.photo-upload-text span{color:var(--purple)}
+.photo-upload-sub{font-size:10px;color:#ccc;margin-top:2px;font-weight:600}
+.char-photo-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px}
+.char-photo-thumb{position:relative;aspect-ratio:1;border-radius:9px;overflow:hidden;border:2px solid var(--border);background:var(--cream)}
+.char-photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.char-photo-remove{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.55);border:none;color:white;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .15s}
+.char-photo-remove:hover{background:var(--coral)}
+.char-photo-slot-empty{aspect-ratio:1;border-radius:9px;border:2px dashed #e0d0f0;background:transparent;display:flex;align-items:center;justify-content:center;font-size:14px;opacity:.3}
+.char-photos-count{font-size:11px;color:#aaa;font-weight:600;text-align:right}
+.char-photos-count strong{color:var(--purple)}
+
+/* ── DEFAULT IMAGES SECTION ─── */
+.default-images-section{padding:14px 20px 16px;border-top:2px solid var(--border)}
+.default-img-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.default-img-card{border-radius:11px;border:2px solid var(--border);background:var(--cream);overflow:hidden;position:relative}
+.default-img-thumb{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.default-img-placeholder{width:100%;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:linear-gradient(135deg,#f5eeff,#fff0e8)}
+.default-img-placeholder span{font-size:20px;opacity:.35}
+.default-img-placeholder small{font-size:9px;color:#ccc;font-weight:700;text-align:center;padding:0 6px;line-height:1.4}
+.default-img-label{font-size:10px;font-weight:700;color:#aaa;padding:4px 8px 5px;letter-spacing:.04em;text-transform:uppercase;background:var(--paper);border-top:1px solid var(--border)}
+.default-img-overlay{position:absolute;inset:0;background:rgba(255,255,255,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-radius:9px}
+.default-img-overlay .illus-spinner-sm{width:18px;height:18px;border:3px solid #e0d0ff;border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite}
+.default-img-overlay small{font-size:9px;color:#bbb;font-weight:700}
+.default-img-status{font-size:11px;font-weight:600;color:#aaa;margin-bottom:8px;min-height:14px;line-height:1.4}
+.default-img-status.ok{color:#2e7d32}.default-img-status.err{color:#c0392b}
+.btn-gen-defaults{width:100%;padding:10px 16px;border-radius:12px;border:2px solid var(--purple);background:#f5eeff;color:var(--purple);font-family:'Baloo 2',cursive;font-size:.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s}
+.btn-gen-defaults:hover:not(:disabled){background:var(--purple);color:white;box-shadow:0 4px 14px rgba(155,93,229,.3)}
+.btn-gen-defaults:disabled{opacity:.55;cursor:wait}
+
+/* ── GEMINI API KEY ─── */
+.api-key-section{padding:14px 20px 16px;border-top:2px solid var(--border)}
+.api-key-label{display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;color:#aaa;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.api-key-badge{font-size:9px;padding:2px 7px;border-radius:8px;background:#e8f5e9;color:#2e7d32;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.api-key-wrap{position:relative}
+.api-key-input{width:100%;padding:9px 36px 9px 13px;border:2px solid var(--border);border-radius:11px;font-family:'Nunito',sans-serif;font-size:.88rem;background:var(--cream);color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;font-family:monospace;letter-spacing:.03em}
+.api-key-input:focus{border-color:#4caf50;box-shadow:0 0 0 3px rgba(76,175,80,.12)}
+.api-key-input::placeholder{font-family:'Nunito',sans-serif;letter-spacing:0;color:#ccc}
+.api-key-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#aaa;font-size:15px;padding:2px}
+.api-key-toggle:hover{color:var(--ink)}
+.api-key-hint{font-size:11px;color:#aaa;margin-top:5px;line-height:1.5}
+.api-key-hint a{color:var(--purple);text-decoration:none;font-weight:700}
+.api-key-hint a:hover{text-decoration:underline}
+.api-key-status{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;margin-top:6px}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.status-dot.active{background:#4caf50}.status-dot.inactive{background:#ccc}
+
+/* ── SPREAD (open pages) ───────────────────────────────── */
+.book-spread{position:absolute;inset:0;display:flex;align-items:stretch;box-shadow:0 14px 50px rgba(0,0,0,.18);border-radius:5px;overflow:hidden}
+.spread-page{flex:1;height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.spread-left{background:#fff;border-radius:5px 0 0 5px;border:1.5px solid #ead9bc;border-right:none;box-shadow:inset -8px 0 20px rgba(0,0,0,.05)}
+.spread-right{background:#fff;border-radius:0 5px 5px 0;border:1.5px solid #ead9bc;box-shadow:inset 8px 0 20px rgba(0,0,0,.04)}
+.spread-spine{width:14px;min-width:14px;background:linear-gradient(to right,#c5a055,#e8c98a 40%,#d4a84b 60%,#b8913e);box-shadow:2px 0 8px rgba(0,0,0,.12),-2px 0 8px rgba(0,0,0,.08);z-index:2;flex-shrink:0}
+/* Text header — white band at the top, two lines tall */
+.page-text-header{flex-shrink:0;background:#fff;padding:10px 14px 8px;border-bottom:1px solid rgba(0,0,0,.07);display:flex;align-items:center;min-height:54px}
+.page-text{font-size:clamp(.75rem,1.2vw,.9rem);line-height:1.55;color:var(--ink);margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* Full-bleed illustration — takes all remaining height */
+.page-illus-wrap{flex:1;width:100%;overflow:hidden;position:relative;background:linear-gradient(135deg,#f5eeff,#fff0e8);display:flex;align-items:center;justify-content:center}
+.page-illus-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.illus-placeholder{font-size:40px;opacity:.3}
+.illus-loading-sm{display:flex;flex-direction:column;align-items:center;gap:6px}
+.illus-spinner-sm{width:22px;height:22px;border:3px solid #e0d0ff;border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite}
+.illus-loading-sm span{font-size:11px;color:#bbb;font-weight:700}
+@keyframes spin{to{transform:rotate(360deg)}}
+.page-footer{display:flex;justify-content:center;padding:4px 0;background:#fff;border-top:1px solid rgba(0,0,0,.06);flex-shrink:0}
+.page-num{font-size:10px;color:#ccc;font-weight:700;letter-spacing:.05em;font-family:'Baloo 2',cursive}
+
+/* ── CLOSED COVER (overlay over left half of the viewer) ── */
+.cover-closed{
+  position:absolute;
+  inset:0;
+  border-radius:6px 16px 16px 6px;
+  overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:clamp(16px,5%,40px);
+  box-shadow:-5px 0 0 0 rgba(0,0,0,.3), 8px 12px 40px rgba(0,0,0,.25);
+}
+/* spine shadow on left edge */
+.cover-closed::before{content:'';position:absolute;left:0;top:0;bottom:0;width:18px;background:rgba(0,0,0,.22);border-radius:6px 0 0 6px}
+/* sheen */
+.cover-closed::after{content:'';position:absolute;top:0;left:18px;right:0;bottom:0;background:linear-gradient(135deg,rgba(255,255,255,.2) 0%,transparent 50%);pointer-events:none}
+.cover-big-emoji{font-size:clamp(60px,10vw,100px);margin-bottom:14px;position:relative;z-index:1;animation:emojiFloat 4s ease-in-out infinite}
+@keyframes emojiFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.cover-big-title{font-family:'Baloo 2',cursive;font-size:clamp(1.1rem,3vw,1.9rem);font-weight:800;color:white;text-align:center;text-shadow:0 2px 10px rgba(0,0,0,.4);line-height:1.2;max-width:90%;position:relative;z-index:1}
+.cover-big-author{font-size:clamp(.75rem,1.5vw,.9rem);color:rgba(255,255,255,.75);font-weight:700;letter-spacing:.07em;margin-top:10px;position:relative;z-index:1}
+.cover-stars{display:flex;gap:5px;margin-top:12px;position:relative;z-index:1}
+.cover-stars span{font-size:16px;animation:twinkle 2s ease-in-out infinite}
+.cover-stars span:nth-child(2){animation-delay:.35s}.cover-stars span:nth-child(3){animation-delay:.7s}
+@keyframes twinkle{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+
+/* Right half of closed book — back cover (muted) */
+
+/* ── BACK COVER ─────────────────────────────────────────────
+   Mirror of front cover: spine on the RIGHT edge.
+   Same gradient but lighter content, no title.
+─────────────────────────────────────────────────────────── */
+.cover-back{
+  position:absolute;
+  inset:0;
+  border-radius:16px 6px 6px 16px;
+  overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:clamp(16px,5%,40px);
+  box-shadow:5px 0 0 0 rgba(0,0,0,.3), -8px 12px 40px rgba(0,0,0,.25);
+}
+/* spine shadow on RIGHT edge */
+.cover-back::before{content:'';position:absolute;right:0;top:0;bottom:0;width:18px;background:rgba(0,0,0,.22);border-radius:0 6px 6px 0}
+/* sheen — reversed, comes from top-right */
+.cover-back::after{content:'';position:absolute;top:0;left:0;right:18px;bottom:0;background:linear-gradient(225deg,rgba(255,255,255,.15) 0%,transparent 50%);pointer-events:none}
+.cover-back-emoji{font-size:clamp(40px,7vw,70px);opacity:.4;position:relative;z-index:1;margin-bottom:16px}
+.cover-back-tagline{font-family:'Baloo 2',cursive;font-size:clamp(.75rem,1.5vw,1rem);font-weight:700;color:rgba(255,255,255,.5);text-align:center;position:relative;z-index:1;font-style:italic;max-width:80%}
+.cover-back-isbn{font-size:clamp(.6rem,1.1vw,.8rem);color:rgba(255,255,255,.35);font-weight:700;letter-spacing:.12em;margin-top:auto;position:relative;z-index:1}
+
+
+
+
+
+
+/* Loading overlay */
+.page-loading-overlay{position:absolute;inset:0;background:rgba(255,255,255,.88);backdrop-filter:blur(3px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-radius:5px;z-index:30}
+.big-spinner{width:38px;height:38px;border:4px solid #e0d0ff;border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite}
+
+/* NAV */
+.page-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:10px;flex-shrink:0}
+.nav-btn{width:46px;height:46px;border-radius:50%;border:2px solid var(--border);background:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 3px 10px var(--shadow);color:var(--ink)}
+.nav-btn:hover:not(:disabled){border-color:var(--purple);color:var(--purple);transform:scale(1.08);box-shadow:0 6px 16px rgba(155,93,229,.2)}
+.nav-btn:disabled{opacity:.25;cursor:default}
+.page-indicator{font-family:'Baloo 2',cursive;font-size:.93rem;font-weight:700;color:#aaa;min-width:100px;text-align:center}
+.dot-track{display:flex;gap:6px;align-items:center;justify-content:center;margin-top:8px;flex-wrap:wrap;flex-shrink:0}
+.dot-indicator{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .25s;cursor:pointer}
+.dot-indicator.active{background:var(--coral);transform:scale(1.3)}
+.dot-indicator:hover{background:var(--purple)}
+
+/* RESPONSIVE */
+@media(max-width:900px){:root{--panel-w:270px}}
+@media(max-width:640px){
+  #editorView{height:auto}
+  .editor-layout{flex-direction:column;height:auto}
+  .left-panel{width:100%;min-width:0;border-right:none;border-bottom:2px solid var(--border)}
+  .book-stage{padding:16px 12px 32px}
+  header{padding:14px 20px}
+  .shelf{padding:0 20px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:20px}
+  .section-label{padding:0 20px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-shapes">
+  <div class="shape"></div><div class="shape"></div><div class="shape"></div><div class="shape"></div>
+</div>
+
+<header>
+  <div class="logo" onclick="goHome()">
+    <div class="logo-icon">📖</div>
+    <div class="logo-text">Storybook <span>Studio</span></div>
+  </div>
+  <button class="header-btn" onclick="openBlank()">✨ New blank book</button>
+</header>
+
+<!-- HOME -->
+<div id="homeView">
+  <div class="home-hero">
+    <h1>Pick a story to<br><em>make your own</em></h1>
+    <p>Tap any book to customise its title, hero, and setting — then generate your illustrated story!</p>
+  </div>
+  <div class="section-label"><h2>✨ Sample Books</h2><div class="section-line"></div></div>
+  <div class="shelf" id="shelf"></div>
+</div>
+
+<!-- EDITOR -->
+<div id="editorView">
+  <div class="editor-layout">
+
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+      <div class="panel-header">
+        <div class="back-btn" onclick="goHome()">← Back to library</div>
+        <div class="panel-title">Edit Story</div>
+        <div class="panel-subtitle" id="panelSubtitle">Customise your book</div>
+      </div>
+      <div class="panel-section" style="padding-top:14px">
+        <div class="section-heading"><div class="sh-icon" style="background:#fff3cc">📝</div> Story Details</div>
+        <label>Book Title</label><input type="text" id="bookTitle" placeholder="e.g. The Brave Little Bunny"/>
+        <label>Author Name</label><input type="text" id="authorName" placeholder="e.g. Emma & Dad"/>
+        <label>Hero's Name</label><input type="text" id="charName" placeholder="e.g. Pip, Luna, Max…"/>
+        <label>Setting / Location</label><input type="text" id="storyLocation" placeholder="e.g. an enchanted forest…"/>
+        <label>What happens?</label><textarea id="storySeed" placeholder="e.g. A bunny finds a magical glowing flower…"></textarea>
+        <label>Moral / Lesson</label><input type="text" id="moral" placeholder="e.g. Bravery, friendship…"/>
+      </div>
+      <div class="panel-section" style="padding-top:14px">
+        <div class="section-heading"><div class="sh-icon" style="background:#ffe0e0">🐾</div> Hero Character</div>
+        <div class="char-grid-sm" id="charGrid">
+          <button class="char-btn active" data-char="🐰" onclick="selectChar(this)"><span class="ce">🐰</span>Bunny</button>
+          <button class="char-btn" data-char="🐲" onclick="selectChar(this)"><span class="ce">🐲</span>Dragon</button>
+          <button class="char-btn" data-char="🦊" onclick="selectChar(this)"><span class="ce">🦊</span>Fox</button>
+          <button class="char-btn" data-char="🦉" onclick="selectChar(this)"><span class="ce">🦉</span>Owl</button>
+          <button class="char-btn" data-char="🧚" onclick="selectChar(this)"><span class="ce">🧚</span>Fairy</button>
+          <button class="char-btn" data-char="🐻" onclick="selectChar(this)"><span class="ce">🐻</span>Bear</button>
+          <button class="char-btn" data-char="🦄" onclick="selectChar(this)"><span class="ce">🦄</span>Unicorn</button>
+          <button class="char-btn" data-char="🧙" onclick="selectChar(this)"><span class="ce">🧙</span>Wizard</button>
+        </div>
+      </div>
+      <!-- CHARACTER PHOTOS -->
+      <div class="char-photos-section">
+        <div class="section-heading" style="margin-bottom:6px"><div class="sh-icon" style="background:#fce4ec">📸</div> Character Photos <span style="font-size:10px;font-weight:600;color:#ccc;font-family:'Nunito',sans-serif;margin-left:2px">optional</span></div>
+        <div class="char-photos-hint">Upload up to <strong>5 photos</strong> of your hero. Gemini will use them as reference to illustrate the story.</div>
+        <div class="char-photo-grid" id="charPhotoGrid"></div>
+        <div class="photo-upload-zone" id="photoUploadZone">
+          <input type="file" id="charPhotoInput" accept="image/*" multiple onchange="handleCharPhotoUpload(this.files)"/>
+          <div class="photo-upload-icon">📷</div>
+          <div class="photo-upload-text"><span>Choose photos</span> or drag & drop</div>
+          <div class="photo-upload-sub">JPG, PNG, WEBP · max 5 photos · 4 MB each</div>
+        </div>
+        <div class="char-photos-count" id="charPhotosCount"></div>
+      </div>
+
+      <div class="panel-section" style="padding-top:14px">
+        <div class="section-heading"><div class="sh-icon" style="background:#eedeff">🎨</div> Style & Age</div>
+        <label>Illustration Style</label>
+        <div class="chip-row" id="styleRow">
+          <button class="chip active" onclick="selectChip(this,'styleRow')">Watercolour</button>
+          <button class="chip" onclick="selectChip(this,'styleRow')">Cartoon</button>
+          <button class="chip" onclick="selectChip(this,'styleRow')">Cosy & Warm</button>
+          <button class="chip" onclick="selectChip(this,'styleRow')">Dreamy</button>
+        </div>
+        <label>Age Range</label>
+        <div class="chip-row" id="ageRow">
+          <button class="chip active" onclick="selectChip(this,'ageRow')">2 – 4</button>
+          <button class="chip" onclick="selectChip(this,'ageRow')">4 – 6</button>
+          <button class="chip" onclick="selectChip(this,'ageRow')">6 – 8</button>
+          <button class="chip" onclick="selectChip(this,'ageRow')">8 – 10</button>
+        </div>
+        <label>Colour Theme</label>
+        <div class="color-row" id="colorRow">
+          <div class="color-swatch active" style="background:#ffd166" onclick="selectColor(this,'#ffd166','135deg,#ffd166,#ffb347')"></div>
+          <div class="color-swatch" style="background:#ff6b6b" onclick="selectColor(this,'#ff6b6b','135deg,#ff6b6b,#ff4f81')"></div>
+          <div class="color-swatch" style="background:#06d6a0" onclick="selectColor(this,'#06d6a0','135deg,#06d6a0,#00b4d8')"></div>
+          <div class="color-swatch" style="background:#118ab2" onclick="selectColor(this,'#118ab2','135deg,#118ab2,#023e8a')"></div>
+          <div class="color-swatch" style="background:#9b5de5" onclick="selectColor(this,'#9b5de5','135deg,#9b5de5,#c77dff')"></div>
+          <div class="color-swatch" style="background:#f9844a" onclick="selectColor(this,'#f9844a','135deg,#f9844a,#f3722c')"></div>
+        </div>
+        <label>Pages</label>
+        <div class="page-counter">
+          <button class="count-btn" onclick="changePages(-1)">−</button>
+          <span id="pageCount">6 pages</span>
+          <button class="count-btn" onclick="changePages(1)">+</button>
+        </div>
+      </div>
+      <!-- DEFAULT IMAGES -->
+      <div class="default-images-section">
+        <div class="section-heading" style="margin-bottom:8px"><div class="sh-icon" style="background:#e8f5e9">🖼️</div> Default Images</div>
+        <div style="font-size:11px;color:#aaa;font-weight:600;line-height:1.5;margin-bottom:10px">Pre-generate illustrations for pages 1 &amp; 2. Requires your Gemini key below.</div>
+        <div class="default-img-grid">
+          <div class="default-img-card" id="defaultCard0">
+            <div class="default-img-placeholder"><span>🏞️</span><small>Page 1 image</small></div>
+            <div class="default-img-label">Page 1</div>
+          </div>
+          <div class="default-img-card" id="defaultCard1">
+            <div class="default-img-placeholder"><span>🏖️</span><small>Page 2 image</small></div>
+            <div class="default-img-label">Page 2</div>
+          </div>
+        </div>
+        <div class="default-img-status" id="defaultImgStatus"></div>
+        <button class="btn-gen-defaults" id="genDefaultsBtn" onclick="generateDefaultImages()">🪄 Generate Default Images</button>
+      </div>
+
+      <div class="api-key-section">
+        <div class="api-key-label">
+          <span>🖼️ Illustrations</span>
+          <span class="api-key-badge">Gemini</span>
+        </div>
+        <div class="api-key-wrap">
+          <input class="api-key-input" type="password" id="geminiKey" placeholder="Paste Gemini API key…" oninput="updateKeyStatus()"/>
+          <button class="api-key-toggle" onclick="toggleKeyVis()" title="Show/hide key">👁</button>
+        </div>
+        <div class="api-key-status">
+          <div class="status-dot inactive" id="keyDot"></div>
+          <span id="keyStatusText">Using Pollinations (free, no key needed)</span>
+        </div>
+        <div class="api-key-hint">Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a></div>
+      </div>
+      <div class="panel-footer">
+        <button class="btn-generate" id="generateBtn" onclick="generateStory()">
+          <span id="btnText">✨ Generate Story</span>
+          <span class="loading-dots" id="loadingDots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- BOOK STAGE -->
+    <div class="book-stage">
+      <div class="book-stage-title" id="stageTitleEl" contenteditable="true" spellcheck="false" placeholder="Your Book Title"></div>
+      <div class="book-wrap" id="bookWrap">
+        <div class="book-viewer" id="bookViewer"></div>
+      </div>
+      <div class="page-nav">
+        <button class="nav-btn" id="prevBtn" onclick="flipPage(-1)" disabled>‹</button>
+        <div class="page-indicator" id="pageIndicator">Cover</div>
+        <button class="nav-btn" id="nextBtn" onclick="flipPage(1)">›</button>
+      </div>
+      <div class="dot-track" id="dotTrack"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+const SAMPLE_BOOKS = [
+  {title:"The Brave Little Bunny",      emoji:"🐰",char:"🐰",charName:"Pip",  location:"a misty enchanted meadow",             seed:"A tiny bunny scared of the dark discovers a magical glowing flower and finds her courage",  moral:"Bravery",              gradient:"linear-gradient(150deg,#ffd166,#ff9966)",genre:"Adventure",  pages:6,style:"Watercolour", age:"2 – 4",color:"#ffd166",colorGrad:"135deg,#ffd166,#ffb347"},
+  {title:"Dragon Who Lost His Roar",    emoji:"🐲",char:"🐲",charName:"Ember",location:"the smoky Mountain of Echoes",          seed:"A young dragon finds his roar has vanished and goes on a quest to find it",                moral:"Self-belief",          gradient:"linear-gradient(150deg,#ff6b6b,#c0392b)",genre:"Quest",      pages:6,style:"Cartoon",     age:"4 – 6",color:"#ff6b6b",colorGrad:"135deg,#ff6b6b,#ff4f81"},
+  {title:"Owl and the Starry Map",      emoji:"🦉",char:"🦉",charName:"Luna", location:"the Great Whispering Forest",          seed:"A wise owl finds an ancient star map leading to a hidden library of wondrous books",       moral:"Curiosity & learning", gradient:"linear-gradient(150deg,#118ab2,#023e8a)",genre:"Mystery",    pages:6,style:"Dreamy",      age:"4 – 6",color:"#118ab2",colorGrad:"135deg,#118ab2,#023e8a"},
+  {title:"The Unicorn of Rainbow Reef", emoji:"🦄",char:"🦄",charName:"Cosmo",location:"the shimmering Rainbow Reef",          seed:"A unicorn under the ocean learns that sharing colours makes the whole reef brighter",       moral:"Generosity",           gradient:"linear-gradient(150deg,#9b5de5,#c77dff)", genre:"Friendship", pages:8,style:"Dreamy",      age:"2 – 4",color:"#9b5de5",colorGrad:"135deg,#9b5de5,#c77dff"},
+  {title:"Fox and the Frozen Lake",     emoji:"🦊",char:"🦊",charName:"Finn", location:"a snow-covered winter forest",         seed:"A clever fox helps forest animals when the lake freezes by finding a warm underground spring",moral:"Kindness",             gradient:"linear-gradient(150deg,#f9844a,#f3722c)", genre:"Winter Tale",pages:6,style:"Cosy & Warm",age:"4 – 6",color:"#f9844a",colorGrad:"135deg,#f9844a,#f3722c"},
+  {title:"The Bear Who Baked Stars",    emoji:"🐻",char:"🐻",charName:"Beau", location:"a cosy bakery at the top of a cloud", seed:"A bear chef discovers a magical recipe to bake real stars and lights up a dark village",     moral:"Creativity & sharing", gradient:"linear-gradient(150deg,#06d6a0,#00b4d8)", genre:"Magical",    pages:8,style:"Watercolour", age:"6 – 8",color:"#06d6a0",colorGrad:"135deg,#06d6a0,#00b4d8"},
+];
+
+// ══════════════════════════════════════════════════════════════════════
+// DEFAULT ILLUSTRATIONS
+// Keys are 0-based page indices. Values are data URLs set at runtime
+// by generateDefaultImages(), or you can hard-code paths/URLs here.
+// ══════════════════════════════════════════════════════════════════════
+const DEFAULT_IMAGES = {};
+
+const DEFAULT_IMAGE_PROMPTS = [
+  "create an image of a dog and a toddler playing at tunnel tops park in San Francisco in the style of a children's book illustration",
+  "create an image of a dog and a toddler walking along the beach of chrissy field in the style of a children's book illustration",
+];
+
+async function generateDefaultImages() {
+  const key = document.getElementById('geminiKey').value.trim();
+  if (!key) {
+    setDefaultStatus('⚠️ Please enter your Gemini API key first.', 'err');
+    return;
+  }
+  const btn = document.getElementById('genDefaultsBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-dots" style="display:flex"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>';
+  setDefaultStatus('Generating illustrations…', '');
+
+  const results = await Promise.all(DEFAULT_IMAGE_PROMPTS.map((prompt, i) => {
+    showDefaultCardSpinner(i, true);
+    return generateImagenIllustration(prompt, key, characterPhotos).then(result => ({ i, result }));
+  }));
+
+  let ok = 0, lastError = null;
+  results.forEach(({ i, result }) => {
+    showDefaultCardSpinner(i, false);
+    const isUrl = typeof result === 'string' && result.startsWith('data:');
+    if (isUrl) {
+      DEFAULT_IMAGES[i] = result;
+      renderDefaultCard(i, result);
+      ok++;
+    } else {
+      if (result?.error) lastError = result.error;
+      setDefaultCardError(i);
+    }
+  });
+
+  btn.disabled = false;
+  btn.innerHTML = '🪄 Regenerate Default Images';
+  if (ok === DEFAULT_IMAGE_PROMPTS.length) {
+    setDefaultStatus('✓ Both images ready — click Generate Story to use them.', 'ok');
+  } else if (ok > 0) {
+    setDefaultStatus(`✓ ${ok} of ${DEFAULT_IMAGE_PROMPTS.length} generated. Check key / quota for the rest.`, 'err');
+  } else {
+    setDefaultStatus(lastError ? `❌ ${lastError}` : 'Generation failed. Check your API key and try again.', 'err');
+  }
+}
+
+function showDefaultCardSpinner(idx, show) {
+  const card = document.getElementById(`defaultCard${idx}`);
+  if (!card) return;
+  let overlay = card.querySelector('.default-img-overlay');
+  if (show) {
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.className = 'default-img-overlay';
+      overlay.innerHTML = '<div class="illus-spinner-sm"></div><small>Painting…</small>';
+      card.appendChild(overlay);
+    }
+  } else {
+    overlay?.remove();
+  }
+}
+
+function renderDefaultCard(idx, url) {
+  const card = document.getElementById(`defaultCard${idx}`);
+  if (!card) return;
+  const placeholder = card.querySelector('.default-img-placeholder');
+  if (placeholder) placeholder.remove();
+  let img = card.querySelector('.default-img-thumb');
+  if (!img) {
+    img = document.createElement('img');
+    img.className = 'default-img-thumb';
+    card.insertBefore(img, card.querySelector('.default-img-label'));
+  }
+  img.src = url;
+}
+
+function setDefaultCardError(idx) {
+  const card = document.getElementById(`defaultCard${idx}`);
+  if (!card) return;
+  const ph = card.querySelector('.default-img-placeholder');
+  if (ph) ph.querySelector('small').textContent = 'Failed — retry';
+}
+
+function setDefaultStatus(msg, type) {
+  const el = document.getElementById('defaultImgStatus');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'default-img-status' + (type ? ` ${type}` : '');
+}
+
+
+// ── STATE ─────────────────────────────────────────────────────────────
+let selectedChar = '🐰', coverGrad = '135deg,#ffd166,#ffb347';
+let pageCount = 6, currentPage = 0, totalSlides = 1;
+let generatedPages = [], flipping = false;
+let characterPhotos = []; // Array of {dataUrl, mimeType} — max 5
+
+// ── CHARACTER PHOTOS ──────────────────────────────────────────────────
+function handleCharPhotoUpload(files) {
+  const remaining = 5 - characterPhotos.length;
+  const toAdd = Array.from(files).slice(0, remaining);
+  let loaded = 0;
+  toAdd.forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    if (file.size > 4 * 1024 * 1024) return; // 4 MB cap
+    const reader = new FileReader();
+    reader.onload = e => {
+      characterPhotos.push({ dataUrl: e.target.result, mimeType: file.type });
+      loaded++;
+      if (loaded === toAdd.length) renderCharPhotoGrid();
+    };
+    reader.readAsDataURL(file);
+  });
+  // Reset input so the same file can be re-selected after removal
+  document.getElementById('charPhotoInput').value = '';
+}
+
+function removeCharPhoto(idx) {
+  characterPhotos.splice(idx, 1);
+  renderCharPhotoGrid();
+}
+
+function renderCharPhotoGrid() {
+  const grid = document.getElementById('charPhotoGrid');
+  const count = document.getElementById('charPhotosCount');
+  if (!grid) return;
+  grid.innerHTML = '';
+  // Filled slots
+  characterPhotos.forEach((photo, i) => {
+    const div = document.createElement('div');
+    div.className = 'char-photo-thumb';
+    div.innerHTML = `<img src="${photo.dataUrl}" alt="Character photo ${i+1}"/>
+      <button class="char-photo-remove" onclick="removeCharPhoto(${i})" title="Remove">✕</button>`;
+    grid.appendChild(div);
+  });
+  // Empty slots up to 5
+  for (let i = characterPhotos.length; i < 5; i++) {
+    const div = document.createElement('div');
+    div.className = 'char-photo-slot-empty';
+    div.textContent = '＋';
+    grid.appendChild(div);
+  }
+  // Hide upload zone if full
+  const zone = document.getElementById('photoUploadZone');
+  if (zone) zone.style.display = characterPhotos.length >= 5 ? 'none' : 'block';
+  // Count label
+  if (count) {
+    count.innerHTML = characterPhotos.length > 0
+      ? `<strong>${characterPhotos.length}</strong> / 5 photo${characterPhotos.length !== 1 ? 's' : ''} uploaded`
+      : '';
+  }
+  updateKeyStatus();
+}
+
+// Drag-and-drop on the upload zone
+document.addEventListener('DOMContentLoaded', () => renderCharPhotoGrid());
+document.addEventListener('dragover', e => {
+  const zone = document.getElementById('photoUploadZone');
+  if (zone && zone.contains(e.target)) { e.preventDefault(); zone.classList.add('drag-over'); }
+});
+document.addEventListener('dragleave', e => {
+  const zone = document.getElementById('photoUploadZone');
+  if (zone && !zone.contains(e.relatedTarget)) zone.classList.remove('drag-over');
+});
+document.addEventListener('drop', e => {
+  const zone = document.getElementById('photoUploadZone');
+  if (zone && zone.contains(e.target)) {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    handleCharPhotoUpload(e.dataTransfer.files);
+  }
+});
+
+// ── HOME ──────────────────────────────────────────────────────────────
+function renderShelf() {
+  const shelf = document.getElementById('shelf');
+  shelf.innerHTML = '';
+  SAMPLE_BOOKS.forEach((b,i) => {
+    const c = document.createElement('div');
+    c.className = 'book-card'; c.style.animationDelay = `${i*.07}s`;
+    c.onclick = () => openBook(b);
+    c.innerHTML = `<div class="book-3d"><div class="book-cover" style="background:${b.gradient}"><div class="book-spine-bar"></div><div class="book-sheen"></div><div class="book-emoji">${b.emoji}</div><div class="book-title-text">${b.title}</div><div class="book-genre">${b.genre}</div></div></div><div class="book-shadow"></div><div class="book-label">${b.title}</div><div class="book-sublabel">${b.emoji} Ages ${b.age}</div>`;
+    shelf.appendChild(c);
+  });
+  const nc = document.createElement('div');
+  nc.className = 'book-card book-card-new'; nc.onclick = openBlank;
+  nc.innerHTML = `<div class="book-3d" style="transform:perspective(600px) rotateY(-8deg)"><div class="new-plus">+</div><div class="new-label">Start fresh</div></div><div class="book-shadow"></div><div class="book-label">Blank Book</div><div class="book-sublabel">✨ Your idea</div>`;
+  shelf.appendChild(nc);
+}
+
+function goHome() {
+  const ev = document.getElementById('editorView');
+  ev.classList.remove('visible');
+  setTimeout(() => { ev.style.display='none'; document.getElementById('homeView').style.display='block'; }, 380);
+  generatedPages=[]; currentPage=0; flipping=false;
+}
+
+function showEditor() {
+  document.getElementById('homeView').style.display = 'none';
+  const ev = document.getElementById('editorView');
+  ev.style.display = 'block';
+  requestAnimationFrame(() => requestAnimationFrame(() => ev.classList.add('visible')));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function openBook(b) {
+  document.getElementById('bookTitle').value     = b.title;
+  document.getElementById('authorName').value    = '';
+  document.getElementById('charName').value      = b.charName;
+  document.getElementById('storyLocation').value = b.location;
+  document.getElementById('storySeed').value     = b.seed;
+  document.getElementById('moral').value         = b.moral;
+  document.getElementById('panelSubtitle').textContent = b.title;
+  document.getElementById('stageTitleEl').textContent  = b.title;
+  selectedChar = b.char; coverGrad = b.colorGrad;
+  document.querySelectorAll('.char-btn').forEach(x => x.classList.toggle('active', x.dataset.char===b.char));
+  document.querySelectorAll('.color-swatch').forEach(x => x.classList.toggle('active', x.style.background===b.color));
+  document.querySelectorAll('#styleRow .chip').forEach(x => x.classList.toggle('active', x.textContent.trim()===b.style));
+  document.querySelectorAll('#ageRow .chip').forEach(x => x.classList.toggle('active', x.textContent.trim()===b.age));
+  pageCount=b.pages; document.getElementById('pageCount').textContent=`${b.pages} pages`;
+  generatedPages=[]; currentPage=0; flipping=false;
+  showEditor();
+  // Render after editor is visible so dimensions are available
+  requestAnimationFrame(() => renderCover());
+}
+
+function openBlank() {
+  ['bookTitle','authorName','charName','storyLocation','storySeed','moral'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('panelSubtitle').textContent='New blank book';
+  document.getElementById('stageTitleEl').textContent='';
+  selectedChar='🐰'; coverGrad='135deg,#ffd166,#ffb347';
+  document.querySelectorAll('.char-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  document.querySelectorAll('.color-swatch').forEach((s,i)=>s.classList.toggle('active',i===0));
+  document.querySelectorAll('#styleRow .chip').forEach((c,i)=>c.classList.toggle('active',i===0));
+  document.querySelectorAll('#ageRow .chip').forEach((c,i)=>c.classList.toggle('active',i===0));
+  pageCount=6; document.getElementById('pageCount').textContent='6 pages';
+  generatedPages=[]; currentPage=0; flipping=false;
+  showEditor();
+  requestAnimationFrame(() => renderCover());
+}
+
+// ── PANEL INTERACTIONS ────────────────────────────────────────────────
+function selectChar(btn) {
+  document.querySelectorAll('.char-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); selectedChar=btn.dataset.char;
+  if(currentPage===0) renderCover();
+}
+function selectChip(btn,rowId) {
+  document.querySelectorAll(`#${rowId} .chip`).forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function selectColor(el,color,grad) {
+  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active'); coverGrad=grad;
+  if(currentPage===0) renderCover();
+}
+function changePages(d) {
+  pageCount=Math.max(4,Math.min(12,pageCount+d));
+  document.getElementById('pageCount').textContent=`${pageCount} pages`;
+}
+
+// Title sync
+document.getElementById('bookTitle').addEventListener('input',function(){
+  document.getElementById('stageTitleEl').textContent=this.value||'';
+  document.getElementById('panelSubtitle').textContent=this.value||'My Story';
+  if(currentPage===0) renderCover();
+});
+document.getElementById('authorName').addEventListener('input',function(){
+  if(currentPage===0) renderCover();
+});
+document.getElementById('stageTitleEl').addEventListener('input',function(){
+  document.getElementById('bookTitle').value=this.textContent;
+  document.getElementById('panelSubtitle').textContent=this.textContent||'My Story';
+  if(currentPage===0) renderCover();
+});
+
+// ── RENDERING ─────────────────────────────────────────────────────────
+function coverInnerHTML() {
+  const title  = document.getElementById('bookTitle').value  || 'My Amazing Story';
+  const author = document.getElementById('authorName').value || 'By You ✨';
+  return `<div class="cover-big-emoji">${selectedChar}</div>
+          <div class="cover-big-title">${title}</div>
+          <div class="cover-big-author">${author}</div>
+          <div class="cover-stars"><span>⭐</span><span>✨</span><span>🌟</span></div>`;
+}
+
+function renderCover() {
+  const wrap = document.getElementById('bookWrap');
+  const v    = document.getElementById('bookViewer');
+  wrap.classList.remove('is-open');
+  v.innerHTML = `<div class="cover-closed" style="background:linear-gradient(${coverGrad})">${coverInnerHTML()}</div>`;
+  currentPage=0; updateNav();
+}
+
+function renderSpread(idx) {
+  const wrap = document.getElementById('bookWrap');
+  const v    = document.getElementById('bookViewer');
+  wrap.classList.add('is-open');
+  const li=(idx-1)*2, ri=li+1;
+  v.innerHTML = `<div class="book-spread">
+    ${pageHTML(generatedPages[li],'spread-left',li)}
+    <div class="spread-spine"></div>
+    ${pageHTML(generatedPages[ri],'spread-right',ri)}
+  </div>`;
+  [li,ri].forEach(i=>{const p=generatedPages[i];if(p?.imgUrl)mountImg(i,p.imgUrl);});
+  currentPage=idx; updateNav();
+}
+
+function renderBackCover() {
+  const wrap = document.getElementById('bookWrap');
+  const v    = document.getElementById('bookViewer');
+  wrap.classList.remove('is-open');
+  const title = document.getElementById('bookTitle').value || 'My Amazing Story';
+  v.innerHTML = `<div class="cover-back" style="background:linear-gradient(${coverGrad})">
+    <div class="cover-back-emoji">${selectedChar}</div>
+    <div class="cover-back-tagline">"${title}"</div>
+    <div class="cover-back-isbn">✦ Storybook Studio ✦</div>
+  </div>`;
+  currentPage = totalSlides - 1;
+  updateNav();
+}
+
+function pageHTML(p,cls,idx) {
+  if(!p) return `<div class="spread-page ${cls}"><div class="page-text-header"><div class="page-text"></div></div><div class="page-illus-wrap"><div class="illus-placeholder">📖</div></div></div>`;
+  const inner = p.imgUrl
+    ? `<img src="${p.imgUrl}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/>`
+    : `<div class="illus-loading-sm"><div class="illus-spinner-sm"></div><span>Painting…</span></div>`;
+  return `<div class="spread-page ${cls}">
+    <div class="page-text-header"><div class="page-text">${p.text||''}</div></div>
+    <div class="page-illus-wrap" id="illus-slot-${idx}">${inner}</div>
+    <div class="page-footer"><div class="page-num">— ${p.page} —</div></div>
+  </div>`;
+}
+
+function mountImg(idx,url) {
+  const slot=document.getElementById(`illus-slot-${idx}`);
+  if(!slot||slot.querySelector('img')) return;
+  const img=new Image();
+  img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block';
+  img.onload=()=>{if(document.getElementById(`illus-slot-${idx}`)){slot.innerHTML='';slot.appendChild(img);}};
+  img.onerror=()=>{if(slot)slot.innerHTML='<div style="font-size:28px;opacity:.3">🖼️</div>';};
+  img.src=url;
+}
+
+function updateNav() {
+  const spreads=Math.ceil(generatedPages.length/2);
+  totalSlides=generatedPages.length>0 ? 2+spreads : 1; // front cover + spreads + back cover
+  document.getElementById('prevBtn').disabled=currentPage===0||flipping;
+  document.getElementById('nextBtn').disabled=currentPage>=totalSlides-1||flipping;
+  const ind=document.getElementById('pageIndicator');
+  if(currentPage===0){ind.textContent='Cover';}
+  else if(currentPage===totalSlides-1&&generatedPages.length>0){ind.textContent='Back Cover';}
+  else{const l=(currentPage-1)*2+1,r=Math.min(l+1,generatedPages.length);ind.textContent=l===r?`Page ${l}`:`Pages ${l} – ${r}`;}
+  const track=document.getElementById('dotTrack');
+  track.innerHTML='';
+  for(let i=0;i<totalSlides;i++){
+    const d=document.createElement('div');
+    d.className='dot-indicator'+(i===currentPage?' active':'');
+    d.onclick=()=>goToSlide(i);
+    track.appendChild(d);
+  }
+}
+
+// ── ANIMATION ─────────────────────────────────────────────────────────
+function flipPage(dir) {
+  const next=currentPage+dir;
+  if(next<0||next>totalSlides-1) return;
+  goToSlide(next);
+}
+
+function goToSlide(i) {
+  if(i===currentPage) return;
+  if(i===0) renderCover();
+  else if(i===totalSlides-1&&generatedPages.length>0) renderBackCover();
+  else renderSpread(i);
+}
+
+
+
+
+
+
+
+
+
+// ── GENERATE ──────────────────────────────────────────────────────────
+async function generateStory() {
+  const btn=document.getElementById('generateBtn');
+  const btnText=document.getElementById('btnText');
+  const dots=document.getElementById('loadingDots');
+  const title    = document.getElementById('bookTitle').value    || 'My Amazing Story';
+  const charName = document.getElementById('charName').value     || 'our hero';
+  const location = document.getElementById('storyLocation').value || 'a magical land';
+  const seed     = document.getElementById('storySeed').value    || 'a magical adventure';
+  const moral    = document.getElementById('moral').value        || '';
+  const style    = document.querySelector('#styleRow .chip.active')?.textContent || 'Watercolour';
+  const age      = document.querySelector('#ageRow .chip.active')?.textContent   || '4–6';
+
+  btnText.style.display='none'; dots.style.display='flex'; btn.disabled=true;
+  flipping=false; generatedPages=[];
+
+  // Show loading
+  const v=document.getElementById('bookViewer');
+  v.innerHTML=`<div class="book-spread" style="position:absolute;inset:0"><div class="spread-page spread-left"></div><div class="spread-spine"></div><div class="spread-page spread-right"></div><div class="page-loading-overlay"><div class="big-spinner"></div><div style="font-family:'Baloo 2',cursive;font-weight:700;color:var(--purple)">Writing your story…</div></div></div>`;
+
+  try {
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,
+        system:`You are a warm children's book author for ages ${age}. Respond ONLY valid JSON, no markdown.`,
+        messages:[{role:'user',content:`Write a children's story:
+Title: "${title}", Hero: ${selectedChar} named ${charName}, Location: ${location}
+Story: ${seed}, Moral: ${moral||'age-appropriate'}, Pages: ${pageCount}, Style: ${style}, Age: ${age}
+Return ONLY JSON (no backticks): {"title":"...","pages":[{"page":1,"scene":"vivid scene for illustrator","text":"2-3 warm sentences"},…]}`}]})
+    });
+    const data=await resp.json();
+    const story=JSON.parse(data.content?.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim());
+    generatedPages=story.pages.map(p=>({...p,imgUrl:null}));
+  } catch(e) {
+    generatedPages=Array.from({length:pageCount},(_,i)=>{
+      const t=[`Once upon a time, ${charName} lived in ${location}.`,`One bright morning, ${charName} set off on a grand adventure.`,`Along the way, a friendly creature appeared.`,`Together they discovered a wonderful secret.`,`${charName} shared it with all their friends, and everyone cheered.`,`And from that day on, everyone knew the magic of kindness. The End. 🌟`];
+      return {page:i+1,scene:t[i%t.length],text:t[i%t.length],imgUrl:null};
+    });
+  }
+
+  // Apply any default images as placeholders (AI will overwrite them if a key is set)
+  generatedPages.forEach((p, i) => {
+    if (DEFAULT_IMAGES[i]) p.imgUrl = DEFAULT_IMAGES[i];
+  });
+
+  const charLabel=document.querySelector('.char-btn.active')?.querySelector('.ce')?.textContent||selectedChar;
+  const geminiKey=document.getElementById('geminiKey').value.trim();
+
+  if(geminiKey) {
+    // Use Gemini Imagen 3 — generate all illustrations in parallel
+    renderSpread(1);
+    btnText.style.display='inline'; dots.style.display='none';
+    btn.disabled=false; btnText.textContent='✨ Regenerate';
+    // Fire off Imagen requests for each page concurrently
+    // Skip pages that already have a default image assigned
+    generatedPages.forEach((p,i)=>{
+      if(p.imgUrl) return; // keep default image, skip AI generation for this page
+      const prompt=`Children's book illustration, ${style} art style, for ages ${age}. ${p.scene||p.text} The main character is a ${charLabel}. Soft warm colours, whimsical, friendly, storybook look. No text, no words, no letters in the image.`;
+      generateImagenIllustration(prompt, geminiKey, characterPhotos).then(result=>{
+        const dataUrl = typeof result === 'string' ? result : null;
+        if(dataUrl){
+          p.imgUrl=dataUrl;
+          // If this page is currently visible, refresh it
+          const slot=document.getElementById(`illus-slot-${i}`);
+          if(slot){slot.innerHTML='';const img=document.createElement('img');img.src=dataUrl;img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block';slot.appendChild(img);}
+        }
+      });
+    });
+  } else {
+    // Fall back to Pollinations (free, no key)
+    // Only generate for pages that don't already have a default image
+    generatedPages.forEach((p,i)=>{
+      if(p.imgUrl) return; // keep default image
+      const prompt=encodeURIComponent(`Children's book illustration, ${style} style, ages ${age}. Scene: ${p.scene||p.text}. Main character is ${charLabel}. Soft colours, whimsical, warm, no text, no words, no letters.`);
+      const s=Math.floor(Math.random()*99999);
+      p.imgUrl=`https://image.pollinations.ai/prompt/${prompt}?width=512&height=384&seed=${s}&nologo=true&model=flux`;
+    });
+    renderSpread(1);
+    btnText.style.display='inline'; dots.style.display='none';
+    btn.disabled=false; btnText.textContent='✨ Regenerate';
+  }
+}
+
+async function generateImagenIllustration(prompt, apiKey, refPhotos = []) {
+  try {
+    // If reference photos are supplied, use Gemini 2.0 Flash image-generation
+    // which accepts multimodal input (text + images → image output).
+    // Otherwise fall back to Imagen 3 (text-to-image only).
+    if (refPhotos && refPhotos.length > 0) {
+      // Build the multimodal contents array: images first, then the prompt
+      const parts = refPhotos.map(p => ({
+        inlineData: { mimeType: p.mimeType, data: p.dataUrl.split(',')[1] }
+      }));
+      parts.push({ text: `You are illustrating a children's storybook. Using the uploaded photos as a visual reference for the main character's appearance, create a single children's book illustration in a warm, whimsical storybook art style. Scene: ${prompt}. Important: no text, words, or letters in the image. Soft colours, friendly, inviting.` });
+
+      const resp = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts }],
+            generationConfig: { responseModalities: ['IMAGE', 'TEXT'] }
+          })
+        }
+      );
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        const msg = err?.error?.message || `HTTP ${resp.status}`;
+        console.warn('Gemini image-gen error:', msg);
+        return { error: msg };
+      }
+      const data = await resp.json();
+      // Find the inline image part in the response
+      const imgPart = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+      if (imgPart) {
+        const { mimeType, data: b64 } = imgPart.inlineData;
+        return `data:${mimeType};base64,${b64}`;
+      }
+      return { error: 'No image in Gemini response' };
+
+    } else {
+      // No reference photos — use Imagen 3 (text-to-image)
+      const resp = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            instances: [{ prompt }],
+            parameters: { sampleCount: 1, aspectRatio: '4:3', safetySetting: 'block_only_high', personGeneration: 'allow_all' }
+          })
+        }
+      );
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        const msg = err?.error?.message || `HTTP ${resp.status}`;
+        console.warn('Imagen error:', msg);
+        return { error: msg };
+      }
+      const data = await resp.json();
+      const b64 = data?.predictions?.[0]?.bytesBase64Encoded;
+      const mime = data?.predictions?.[0]?.mimeType || 'image/png';
+      return b64 ? `data:${mime};base64,${b64}` : { error: 'No image in Imagen response' };
+    }
+  } catch (e) {
+    console.warn('Imagen fetch failed:', e);
+    return { error: e.message };
+  }
+}
+
+function toggleKeyVis() {
+  const inp=document.getElementById('geminiKey');
+  inp.type=inp.type==='password'?'text':'password';
+}
+
+function updateKeyStatus() {
+  const key=document.getElementById('geminiKey').value.trim();
+  const dot=document.getElementById('keyDot');
+  const txt=document.getElementById('keyStatusText');
+  if(key){
+    dot.className='status-dot active';
+    const photoMode = characterPhotos.length > 0;
+    txt.textContent = photoMode
+      ? `Gemini image-gen (${characterPhotos.length} ref photo${characterPhotos.length!==1?'s':''}) ✓`
+      : 'Using Gemini Imagen 3 ✓';
+    txt.style.color='#2e7d32';
+  } else {
+    dot.className='status-dot inactive';
+    txt.textContent='Using Pollinations (free, no key needed)';
+    txt.style.color='#aaa';
+  }
+}
+
+// ── KEYBOARD ──────────────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('editorView').classList.contains('visible')) return;
+  const tag=document.activeElement?.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA'||document.activeElement?.isContentEditable) return;
+  if(e.key==='ArrowRight'){e.preventDefault();flipPage(1);}
+  if(e.key==='ArrowLeft'){e.preventDefault();flipPage(-1);}
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────
+renderShelf();
+</script>
+</body>
+</html>
